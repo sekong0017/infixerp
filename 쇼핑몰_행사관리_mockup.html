@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>쇼핑몰 행사관리 - ERP</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: '맑은 고딕', 'Malgun Gothic', Arial, sans-serif;
+    font-size: 13px;
+    background: #f5f6f8;
+    color: #333;
+  }
+
+  /* ── 브레드크럼 ── */
+  .breadcrumb-bar {
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 9px 18px;
+    font-size: 12px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .breadcrumb-bar .bc-item { color: #555; }
+  .breadcrumb-bar .bc-item:last-child { color: #222; font-weight: bold; }
+  .breadcrumb-bar .bc-sep { color: #bbb; font-size: 11px; }
+
+  /* ── 페이지 컨텐츠 영역 ── */
+  .page-wrap {
+    padding: 20px 18px;
+  }
+
+  /* ── 폼 테이블 ── */
+  .form-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    margin-bottom: 10px;
+  }
+  .form-table tr {
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .form-table tr:last-child {
+    border-bottom: none;
+  }
+  .form-table th {
+    background: #f5f6f8;
+    border-right: 1px solid #e0e0e0;
+    padding: 9px 14px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #444;
+    white-space: nowrap;
+    text-align: left;
+    width: 110px;
+    vertical-align: middle;
+  }
+  .form-table td {
+    padding: 7px 10px;
+    background: #fff;
+    vertical-align: middle;
+  }
+
+  /* ── 기본 인풋 ── */
+  .erp-input {
+    width: 100%;
+    height: 26px;
+    border: 1px solid #c8c8c8;
+    padding: 0 7px;
+    font-size: 12px;
+    font-family: '맑은 고딕', 'Malgun Gothic', Arial, sans-serif;
+    color: #333;
+    background: #fff;
+    outline: none;
+  }
+  .erp-input:focus { border-color: #4a7fc1; }
+
+  /* ── 셀렉트박스 ── */
+  .erp-select {
+    height: 26px;
+    border: 1px solid #c8c8c8;
+    padding: 0 6px;
+    font-size: 12px;
+    font-family: '맑은 고딕', 'Malgun Gothic', Arial, sans-serif;
+    color: #333;
+    background: #fff;
+    cursor: pointer;
+    min-width: 90px;
+  }
+  .erp-select:focus { border-color: #4a7fc1; outline: none; }
+
+  /* ── 라디오 토글 버튼 그룹 ── */
+  .toggle-group {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  /* 숨겨진 실제 라디오 인풋 */
+  .toggle-group input[type="radio"] {
+    display: none;
+  }
+  /* 버튼처럼 보이는 라벨 */
+  .toggle-group label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 26px;
+    padding: 0 16px;
+    border: 1px solid #c8c8c8;
+    border-right: none;
+    background: #f8f9fa;
+    font-size: 12px;
+    font-family: '맑은 고딕', 'Malgun Gothic', Arial, sans-serif;
+    color: #555;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.12s;
+    user-select: none;
+  }
+  .toggle-group label:first-of-type { border-radius: 2px 0 0 2px; }
+  .toggle-group label:last-of-type  { border-radius: 0 2px 2px 0; border-right: 1px solid #c8c8c8; }
+  .toggle-group label:only-of-type  { border-radius: 2px; border-right: 1px solid #c8c8c8; }
+  .toggle-group label:hover { background: #e8edf5; color: #2e6da4; border-color: #9ab3d0; }
+
+  /* 선택된 상태 */
+  .toggle-group input[type="radio"]:checked + label {
+    background: #2e6da4;
+    color: #fff;
+    border-color: #1a3a5c;
+    font-weight: bold;
+    z-index: 1;
+  }
+
+  /* 항목 미설정 상태 안내 */
+  .toggle-empty {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 14px;
+    border: 1px dashed #c8c8c8;
+    border-radius: 2px;
+    font-size: 11px;
+    color: #bbb;
+    background: #fafafa;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── 버튼 영역 ── */
+  .btn-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    padding: 6px 0;
+  }
+  .btn {
+    height: 28px;
+    padding: 0 20px;
+    font-size: 12px;
+    font-family: '맑은 고딕', 'Malgun Gothic', Arial, sans-serif;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .btn-save {
+    background: #2e6da4;
+    color: #fff;
+    border-color: #1a3a5c;
+  }
+  .btn-save:hover { background: #1a3a5c; }
+  .btn-list {
+    background: #333;
+    color: #fff;
+    border-color: #111;
+  }
+  .btn-list:hover { background: #111; }
+</style>
+</head>
+<body>
+
+<!-- 브레드크럼 -->
+<div class="breadcrumb-bar">
+  <span class="bc-item">상품관리</span>
+  <span class="bc-sep">›</span>
+  <span class="bc-item">쇼핑몰 가격&amp;행사</span>
+  <span class="bc-sep">›</span>
+  <span class="bc-item">쇼핑몰 행사관리</span>
+</div>
+
+<!-- 페이지 내용 -->
+<div class="page-wrap">
+
+  <table class="form-table">
+    <tbody>
+
+      <!-- 캠페인명 -->
+      <tr>
+        <th>캠페인명</th>
+        <td>
+          <input type="text" class="erp-input" id="campaignName" placeholder="">
+        </td>
+      </tr>
+
+      <!-- 캠페인 단위 -->
+      <tr>
+        <th>캠페인 단위</th>
+        <td>
+          <div class="toggle-group">
+            <input type="radio" name="campaignUnit" id="cu_brand" value="brandGr" checked>
+            <label for="cu_brand">브랜드GR</label>
+            <input type="radio" name="campaignUnit" id="cu_product" value="product">
+            <label for="cu_product">상품</label>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 사용여부 -->
+      <tr>
+        <th>사용여부</th>
+        <td>
+          <select class="erp-select" id="useYn">
+            <option value="Y">사용</option>
+            <option value="N">미사용</option>
+          </select>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <!-- 버튼 영역 -->
+  <div class="btn-bar">
+    <button class="btn btn-save" onclick="handleSave()">저장</button>
+    <button class="btn btn-list" onclick="handleList()">목록</button>
+  </div>
+
+</div>
+
+<script>
+// ── 저장 버튼 ──
+function handleSave() {
+  const name = document.getElementById('campaignName').value.trim();
+  if (!name) {
+    alert('캠페인명을 입력해주세요.');
+    document.getElementById('campaignName').focus();
+    return;
+  }
+  alert('저장되었습니다.');
+}
+
+// ── 목록 버튼 ──
+function handleList() {
+  alert('목록 화면으로 이동합니다.');
+}
+
+// 캠페인 단위 선택값 읽기
+function getCampaignUnit() {
+  const selected = document.querySelector('input[name="campaignUnit"]:checked');
+  return selected ? selected.value : null;
+}
+</script>
+</body>
+</html>
